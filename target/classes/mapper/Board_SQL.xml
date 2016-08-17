@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="board">
+
+	<select id="selectRecentlyOrderList5" parameterType="hashmap" resultType="hashmap">
+		SELECT menu.menuName, dorder.menuQuantity, torder.orderReceivedTime, user.userNickname, torder.orderFlag
+		FROM TOrder AS torder, TOrderDetail AS dorder, TUser AS user, TCafe AS cafe, TMenu AS menu
+		WHERE user.userIDX = torder.userIDX
+		AND cafe.cafeIDX = torder.cafeIDX
+		AND menu.menuIDX = dorder.menuIDX  
+		AND dorder.orderDetailIDX = torder.orderDetailIDX 
+		AND torder.cafeIDX = #{cafeIDX}
+		ORDER BY torder.orderIDX DESC
+		LIMIT 5
+	</select>
+	
+	<select id="selectRecentlyOrderList" parameterType="hashmap" resultType="hashmap">
+		SELECT menu.menuName, dorder.menuQuantity, torder.orderReceivedTime, user.userNickname, torder.orderFlag
+		FROM TOrder AS torder, TOrderDetail AS dorder, TUser AS user, TCafe AS cafe, TMenu AS menu
+		WHERE user.userIDX = torder.userIDX
+		AND cafe.cafeIDX = torder.cafeIDX
+		AND menu.menuIDX = dorder.menuIDX  
+		AND dorder.orderDetailIDX = torder.orderDetailIDX 
+		AND torder.cafeIDX = #{cafeIDX}
+		ORDER BY torder.orderIDX DESC
+	</select>
+	
+	<select id="selectNoticeBoardList" parameterType="hashmap" resultType="hashmap">
+		SELECT noticeParentIDX, noticeTitle, noticeCnt, noticeCreDtm 
+		FROM TNoticeBoard
+		WHERE noticeDel = 0
+		AND cafeIDX = #{cafeIDX}
+		ORDER BY noticeParentIDX DESC
+	</select>
+
+	<select id="selectNoticeBoardDetail" parameterType="hashmap" resultType="hashmap">
+		SELECT noticeParentIDX, noticeCnt, noticeCreDtm, noticeTitle, noticeContents
+		FROM TNoticeBoard
+		WHERE noticeParentIDX = #{noticeParentIDX}
+		AND cafeIDX = #{cafeIDX}
+	</select>
+	
+	<select id="selectUserOrderList" parameterType="hashmap" resultType="hashmap">
+		SELECT menu.menuName, dorder.menuQuantity, torder.orderReceivedTime, torder.orderFlag
+		FROM TOrder AS torder, TOrderDetail AS dorder, TUser AS user, TCafe AS cafe, TMenu AS menu
+		WHERE user.userIDX = torder.userIDX
+		AND cafe.cafeIDX = torder.cafeIDX
+		AND menu.menuIDX = dorder.menuIDX  
+		AND dorder.orderDetailIDX = torder.orderDetailIDX 
+		AND torder.cafeIDX = #{cafeIDX}
+		AND user.userNickname = #{userNickname}
+		ORDER BY torder.orderIDX DESC
+	</select>
+	
+	<insert id="insertNoticeBoard" parameterType="hashmap" useGeneratedKeys="true" keyProperty="IDX">
+		INSERT INTO TNoticeBoard (
+		noticeIDX, noticeParentIDX, noticeTitle, noticeContents, noticeCnt, noticeDel, noticeCreDtm, cafeIDX 
+		)
+		VALUES (
+		#{IDX}, #{noticeParentIDX} + 1, #{TITLE}, #{CONTENTS}, 0, 0, CURRENT_TIMESTAMP, #{cafeIDX}
+		)
+	</insert>
+	
+	<select id="getNoticeParentIDXCount" parameterType="Integer" resultType="Integer">
+		SELECT COUNT(noticeParentIDX)
+		FROM TNoticeBoard
+		WHERE cafeIDX = #{cafeIDX}
+	</select>
+	
+	<update id="updateNoticeBoard" parameterType="hashmap">
+		UPDATE TNoticeBoard
+		SET noticeTitle = #{TITLE}, noticeContents = #{CONTENTS}
+		WHERE noticeParentIDX = #{noticeParentIDX}
+		AND cafeIDX = #{cafeIDX}
+	</update>
+	
+	<update id="updateHitCnt" parameterType="hashmap">
+		UPDATE TNoticeBoard
+		SET noticeCnt = (noticeCnt) + 1
+		WHERE noticeParentIDX = #{noticeParentIDX}
+		AND cafeIDX = #{cafeIDX}
+	</update>
+	
+	<update id="deleteNoticeBoard" parameterType="hashmap">
+		UPDATE TNoticeBoard
+		SET noticeDel = 1
+		WHERE noticeParentIDX = #{noticeParentIDX}
+		AND cafeIDX = #{cafeIDX}
+	</update>
+
+</mapper>

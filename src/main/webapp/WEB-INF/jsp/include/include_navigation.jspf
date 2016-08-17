@@ -1,0 +1,51 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- Navigation -->
+<aside id="menu">
+    <div id="navigation">
+        <div class="profile-picture">
+            <a href="<c:url value="/loginSuccess.do"/>" >
+                <img src="images/profile.jpg" class="img-circle m-b" alt="logo">
+            </a>
+
+            <div class="stats-label text-color">
+                <div class="dropdown">
+                    <a class="dropdown-toggle" href="#" data-toggle="dropdown">
+						<span class="font-extra-bold font-uppercase">${cafeName } <i class="pe-7s-config"></i></span>                        
+                    </a>
+                    <ul class="dropdown-menu animated flipInX m-t-xs">
+                        <li><a href="contacts.html">비밀번호 변경</a></li>
+                        <li><a href="contacts.html">menu</a></li>
+                        <li class="divider"></li>
+                        <li><a href="<c:url value="/logout.do" />">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <ul class="nav" id="side-menu">
+            <li>
+                <a href="#"><span class="nav-label">카페 관리</span><span class="fa arrow"></span> </a>
+                <ul class="nav nav-second-level">
+                	<li><a href="<c:url value="/board/openCafeNoticeMnt.do" />">공지사항 관리</a></li>
+                	<li><a href="<c:url value="/customer/openCafeInfoUpdate.do" />">카페 정보 수정</a></li>
+                	<li><a href="<c:url value="/customer/openCafeMenuMnt.do" />">메뉴 관리</a></li>
+                	<li><a href="<c:url value="/customer/openCafeEventMnt.do" />">이벤트 관리</a></li>
+                </ul>
+            <li>
+                <a href="#"><span class="nav-label">e-coupon 관리</span><span class="fa arrow"></span> </a>
+                <ul class="nav nav-second-level">
+                	<li><a href="<c:url value="/customer/openCouponSave.do" />">쿠폰 적립</a></li>
+                	<li><a href="<c:url value="/customer/openCouponAnalytics.do" />">쿠폰 사용 현황/관리</a></li>
+                </ul>
+            </li>
+            <li>
+            	<a href="<c:url value="/customer/openUserAnalytics.do" />"> <span class="nav-label">회원 현황</span><span class="label label-warning pull-right">NEW</span> </a>
+            </li>
+            <li>
+                <a href="<c:url value="/customer/openRecentlyOrders.do" />"> <span class="nav-label">Recently Receive Orders</span><span class="label label-warning pull-right">NEW</span> </a>
+            </li>
+        </ul>
+    </div>
+</aside>

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="customer">
+ 
+ 	<!-- Security -->
+ 	<select id="getCustomerName" parameterType="String" resultType="String">
+ 		SELECT customerId
+ 		FROM TCustomer
+ 		WHERE customerId = #{username}
+ 	</select>
+ 
+ 	<select id="getCustomerPwd" parameterType="String" resultType="String">
+ 		SELECT customerPassword
+ 		FROM TCustomer
+ 		WHERE customerId = #{username}
+ 	</select>
+ 	
+ 	<select id="getCustomerAuth" parameterType="String" resultType="String">
+ 		SELECT customerAuthority
+ 		FROM TCustomer
+ 		WHERE customerId = #{username}
+ 	</select>
+ 	
+ 	<update id="updateCustomerDateLogin" parameterType="hashmap">
+ 		UPDATE TCustomer
+ 		SET customerDateLogin = CURRENT_TIMESTAMP
+ 		WHERE customerId = #{username}
+ 	</update>
+ 	
+ 	
+ 	<!-- select -->
+ 	<select id="getCustomerInfo" parameterType="hashmap" resultType="hashmap">
+ 		SELECT customerIDX, customerId, customerPassword, customerDateLogin
+ 		FROM TCustomer
+ 		WHERE customerId = #{userId}
+ 	</select>
+ 	
+ 	<select id="getSignUpResult" parameterType="hashmap" resultType="Integer">
+ 		SELECT COUNT(customerId)
+ 		FROM TCustomer
+ 		WHERE customerId = #{userId}
+ 	</select>
+ 	
+ 	<select id="getCustomerIDX" parameterType="Object" resultType="Integer">
+ 		SELECT customerIDX
+ 		FROM TCustomer
+ 		WHERE customerId = #{userId}
+ 	</select>
+ 	
+ 	<select id="getCafeName" parameterType="Integer" resultType="String">
+ 		SELECT cafe.cafeName
+ 		FROM TCustomer AS customer, TCafe AS cafe
+ 		WHERE customer.cafeIDX = cafe.cafeIDX
+ 		AND customer.customerIDX = #{customerIDX}
+ 	</select>
+ 	
+ 	<select id="getCafeIDX" parameterType="Integer" resultType="Integer">
+ 		SELECT cafe.cafeIDX
+ 		FROM TCafe AS cafe, TCustomer AS customer
+ 		WHERE cafe.cafeIDX = customer.cafeIDX
+ 		AND customer.customerIDX = #{customerIDX}
+ 	</select>
+ 	
+ 	<select id="selectMenuBoardList" parameterType="hashmap" resultType="hashmap">
+		SELECT menuIDX, menuType, menuName, menuPrice, menuEnabled 
+		FROM TMenu
+		WHERE cafeIDX = #{cafeIDX}
+		AND menuDel = 0
+		ORDER BY menuIDX DESC
+	</select>
+	
+	<select id="selectMenuDetail" parameterType="hashmap" resultType="hashmap">
+		SELECT menuIDX, menuType, menuName, menuPrice, menuEnabled 
+		FROM TMenu
+		WHERE cafeIDX = #{cafeIDX}
+		AND menuIDX = #{menuIDX}
+	</select>
+	
+	<select id="selectUserIDX" parameterType="hashmap" resultType="Integer">
+		SELECT userIDX 
+		FROM TUser
+		WHERE userNickname = #{userNickname}
+	</select>
+	
+	<select id="selectCouponCount" parameterType="hashmap" resultType="Integer">
+		SELECT COUNT(cafeIDX) 
+		FROM TCoupon
+		WHERE userIDX = #{userIDX}
+		AND cafeIDX = #{cafeIDX}
+	</select>
+	
+	<select id="selectCouponAnalyticsBoardList" parameterType="hashmap" resultType="hashmap">
+		SELECT user.userNickname, menu.menuName, dorder.menuQuantity, torder.orderReceivedTime, coupon.couponAmount 
+		FROM TCoupon AS coupon, TMenu AS menu, TCafe AS cafe, TUser AS user, TOrder AS torder, TOrderDetail AS dorder 
+		WHERE torder.userIDX = user.userIDX 
+		AND torder.orderDetailIDX = dorder.orderDetailIDX 
+		AND torder.cafeIDX = cafe.cafeIDX
+		AND dorder.menuIDX = menu.menuIDX
+		AND menu.cafeIDX = cafe.cafeIDX 
+		AND coupon.userIDX = user.userIDX 
+		AND coupon.cafeIDX = cafe.cafeIDX 
+		AND cafe.cafeIDX = #{cafeIDX}
+		AND torder.orderPayType = 0
+		ORDER BY torder.orderIDX DESC
+	</select>
+	
+	<select id="selectUserInfo" parameterType="hashmap" resultType="hashmap">
+		SELECT user.userNickname, coupon.couponAmount, COUNT(torder.cafeIDX) AS orderCount 
+		FROM TUser AS user, TCoupon AS coupon, TOrder AS torder, TCafe AS cafe 
+		WHERE torder.userIDX = user.userIDX
+		AND torder.cafeIDX = cafe.cafeIDX
+		AND coupon.userIDX = user.userIDX
+		AND coupon.cafeIDX = cafe.cafeIDX
+		AND user.userIDX = #{userIDX}
+		AND cafe.cafeIDX = #{cafeIDX}
+	</select>
+	
+	<select id="getCafeIDXByCafeTel" parameterType="Object" resultType="Integer">
+ 		SELECT cafeIDX
+ 		FROM TCafe
+ 		WHERE cafeTel = #{cafeTel}
+ 	</select>
+	
+ 	<!-- insert -->
+ 	<insert id="addCustomer" parameterType="hashmap">
+ 		INSERT INTO TCustomer
+ 		(customerId, customerPassword, customerDateCreate, customerDateUpdate, customerDateLogin, customerAuthority, cafeIDX)
+ 		VALUES 
+ 		(#{userId}, #{userPassword}, NOW(), NOW(), NOW(), 'ROLE_USER', ${cafeIDX})
+ 	</insert>
+ 	
+ 	<insert id="insertCafeMenu" parameterType="hashmap">
+ 		INSERT INTO TMenu
+ 		(cafeIDX, menuType, menuName, menuPrice)
+ 		VALUES 
+ 		(#{cafeIDX}, #{menuType}, #{menuName}, #{menuPrice})
+ 	</insert>
+ 	
+ 	<insert id="insertCoupon" parameterType="hashmap">
+ 		INSERT INTO TCoupon
+ 		(cafeIDX, userIDX, couponAmount)
+ 		VALUES 
+ 		(#{cafeIDX}, #{userIDX}, #{couponAmount})
+ 	</insert>
+ 	
+ 	<insert id="addCafe" parameterType="hashmap">
+ 		INSERT INTO TCafe
+ 		(cafeName, cafeTel, cafeLocation, cafeComment)
+ 		VALUES 
+ 		(#{cafeName}, #{cafeTel}, #{cafeLocation}, #{cafeComment})
+ 	</insert>
+ 	
+ 	<!-- update -->
+ 	<update id="editCustomer" parameterType="hashmap">
+ 		UPDATE TCustomer
+ 		SET customerTel = #{userPhone}, userDateUpdate = CURRENT_TIMESTAMP
+ 		WHERE customerId = #{userId}
+ 	</update>
+ 	
+ 	<update id="updateCafeName" parameterType="hashmap">
+ 		UPDATE TCafe
+ 		SET cafeName = #{cafeName}
+ 		WHERE cafeIDX = #{cafeIDX}
+ 	</update>
+	
+ 	<update id="updateCafeTel" parameterType="hashmap">
+ 		UPDATE TCafe
+ 		SET cafeTel = #{cafeTel}
+ 		WHERE cafeIDX = #{cafeIDX}
+ 	</update>
+ 	
+ 	<update id="updateCafeLocation" parameterType="hashmap">
+ 		UPDATE TCafe
+ 		SET cafeLocation = #{cafeLocation}
+ 		WHERE cafeIDX = #{cafeIDX}
+ 	</update>
+ 	
+ 	<update id="updateCafeComment" parameterType="hashmap">
+ 		UPDATE TCafe
+ 		SET cafeComment = #{cafeComment}
+ 		WHERE cafeIDX = #{cafeIDX}
+ 	</update>
+ 	
+ 	<update id="updateCafeMenu" parameterType="hashmap">
+ 		UPDATE TMenu
+ 		SET menuType = #{menuType}, menuName = #{menuName}, menuPrice = #{menuPrice} 
+ 		WHERE cafeIDX = #{cafeIDX}
+ 		AND menuIDX = #{menuIDX}
+ 	</update>
+ 	
+ 	<update id="updateCoupon" parameterType="hashmap">
+ 		UPDATE TCoupon
+ 		SET couponAmount = (couponAmount) + #{couponAmount}
+ 		WHERE userIDX = #{userIDX}
+ 		AND cafeIDX = #{cafeIDX}
+ 	</update>
+ 	
+ 	
+ 	<!-- delete -->
+ 	
+ 	<update id="deleteCafeMenu" parameterType="hashmap">
+ 		UPDATE TMenu
+ 		SET menuDel = 1
+ 		WHERE menuIDX = #{menuIDX}
+ 		AND cafeIDX = #{cafeIDX}
+ 	</update>
+ 	
+ 	
+</mapper>

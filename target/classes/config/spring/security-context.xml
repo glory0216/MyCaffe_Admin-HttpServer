@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:security="http://www.springframework.org/schema/security"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                        http://www.springframework.org/schema/jdbc  http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+                        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+                        ">
+    <!-- Spring Security의 authentication provider를 Custom하는 방법은 2가지가 있다.
+    	1. userDetailsService를 구현하여 user-service-ref provider로 설정하는 방법
+    	2. authenticationProvider를 구현하여 ref provider로 설정하는 방법. 
+     -->    
+    
+    <security:http auto-config="true" use-expressions="true">
+		
+		<security:intercept-url pattern="/index.jsp" access="permitAll" />
+    	<security:intercept-url pattern="/login.do" access="permitAll" />
+    	<security:intercept-url pattern="/openRegisterPage.do" access="permitAll" />
+    	<security:intercept-url pattern="/logout.do" access="permitAll" />
+    	<security:intercept-url pattern="/logoutSuccess.do" access="permitAll" />
+    	<security:intercept-url pattern="/customer/signup.do" access="permitAll" />
+    	<security:intercept-url pattern="/resources/**" access="permitAll" />
+    	<security:intercept-url pattern="/**" access="hasRole('ROLE_USER')" />
+		<security:form-login login-page="/login.do"
+					username-parameter="id" 
+					password-parameter="pw"		
+					login-processing-url="/loginProcess.do"
+					default-target-url="/loginSuccess.do" 
+					authentication-failure-url="/login.do?fail=true"
+					always-use-default-target="true"
+					/>
+		
+		<security:session-management>
+			<security:concurrency-control max-sessions="1" expired-url="/loginDuplicate.do"/>
+		</security:session-management>
+		
+		<security:logout invalidate-session="true" logout-url="/logout.do" logout-success-url="/logoutSuccess.do" />
+		
+	</security:http>
+ 	
+    <!-- Security -->
+    <!-- <security:authentication-provider user-service-ref="securityService"> -->
+	<security:authentication-manager alias="authManager">
+	    <security:authentication-provider ref="customAuthenticationProvider">
+	   
+	    </security:authentication-provider>
+	</security:authentication-manager>
+ 	    
+ 	<bean id="customAuthenticationProvider" class="mycaffe.login.service.CustomAuthenticationProvider" >
+ 		<property name="securityDAO">
+ 			<bean class="mycaffe.login.dao.SecurityDAOImpl">
+ 				<property name="sqlSessionFactory" ref="sqlSession"></property>
+ 			</bean>
+ 		</property>
+ 		<property name="passwordEncoder" ref="bcryptPasswordEncoder"></property>
+ 	</bean>
+ 	    
+ 	<bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" >
+ 		<constructor-arg name="strength" value="10" />
+ 	</bean>    
+ 	
+ 	<!-- <bean id="securityService" class="weplay.user.service.UserDetailsServiceImpl">
+ 		<property name="securityDAO">
+ 			<bean class="weplay.user.dao.SecurityDAOImpl">
+ 				<property name="sqlSessionFactory" ref="sqlSession"></property>
+ 			</bean>
+ 		</property>
+ 	</bean> -->
+ 	
+</beans>
