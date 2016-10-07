@@ -22,6 +22,8 @@
     	<security:intercept-url pattern="/logoutSuccess.do" access="permitAll" />
     	<security:intercept-url pattern="/customer/signup.do" access="permitAll" />
     	<security:intercept-url pattern="/resources/**" access="permitAll" />
+    	<security:intercept-url pattern="/app/**" access="permitAll" />
+    	<security:intercept-url pattern="/fileDir/**" access="permitAll" />
     	<security:intercept-url pattern="/**" access="hasRole('ROLE_USER')" />
 		<security:form-login login-page="/login.do"
 					username-parameter="id" 

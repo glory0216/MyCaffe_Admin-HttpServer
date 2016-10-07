@@ -355,10 +355,15 @@
             <artifactId>junit</artifactId>
             <version>4.7</version>
             <scope>test</scope>
-        </dependency>   
+        </dependency>
+        
+        <dependency>
+    		<groupId>org.json</groupId>
+    		<artifactId>json</artifactId>
+    		<version>20160212</version>
+		</dependency>   
     </dependencies>
-     
-     
+      
     <build>
         <defaultGoal>install</defaultGoal>
         <directory>${basedir}/target</directory>

@@ -21,7 +21,6 @@
     <link rel="stylesheet" href="<c:url value="/resources/vendor/metisMenu/dist/metisMenu.css"/>" />
     <link rel="stylesheet" href="<c:url value="/resources/vendor/animate.css/animate.css"/>" />
     <link rel="stylesheet" href="<c:url value="/resources/vendor/bootstrap/dist/css/bootstrap.css"/>" />
-    <link rel="stylesheet" href="<c:url value="/resources/vendor/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.css"/>" />
     <link rel="stylesheet" href="<c:url value="/resources/vendor/datatables.net-bs/css/dataTables.bootstrap.min.css"/>" />
 
     <!-- App styles -->
@@ -45,9 +44,75 @@
 <div id="wrapper">
 
     <div class="content animate-panel">
-    	<div class="row">
-    	
-    	</div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="hpanel">
+                    <div class="panel-heading">
+                        <div class="panel-tools">
+                            <a class="showhide"><i class="fa fa-chevron-up"></i></a>
+                        </div>
+                        공지사항 관리
+                    </div>
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered table-hover" id="tableTimeSaleBoard">
+                                <thead>
+                                <tr>
+                                    <th>시간대</th>
+                                    <th>메뉴</th>
+                                    <th>가격</th>
+                                    <th>진행 상태</th>
+                                    <th>이벤트 마감/다시하기</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <c:choose>
+                                	<c:when test="${fn:length(list) > 0}">
+                                		<c:forEach items="${list }" var="row">
+                                			<tr>
+                                    			<td>${row.marketingTimeZone }:00 정각</td>
+                                    			<td>${row.menuName }</td>
+                                    			<td>${row.menuPrice } 원(￦)</td>
+                                    			<td>
+                                    			<c:choose>
+                                    				<c:when test="${row.marketingFlag == 1 }">
+                                    				<i class="fa fa-check text-success"></i>
+                                    				</c:when>
+                                    				<c:otherwise>
+                                    				<i class="fa fa-times text-navy"></i>
+                                    				</c:otherwise>
+                                    			</c:choose>
+                                    			</td>
+                                    			<td>
+                                    			<c:choose>
+                                    				<c:when test="${row.marketingFlag == 1 }">
+                                    				<a href="#this" name="terminate"> 마감하기</a>
+                                    				<input type="hidden" id="marketingIDX" value="${row.marketingIDX }">
+                                    				</c:when>
+                                    				<c:otherwise>
+                                    				<a href="#this" name="restart"> 이벤트 다시하기</a>
+                                    				<input type="hidden" id="marketingIDX" value="${row.marketingIDX }">
+                                    				</c:otherwise>
+                                    			</c:choose>
+                                    			</td>
+                                			</tr>
+                                		</c:forEach>
+                                	</c:when>
+                                	<c:otherwise>
+                                		<tr>
+                        					<td colspan="5">등록된 이벤트가 없습니다.</td>
+                    					</tr>
+                                	</c:otherwise>
+                                </c:choose>
+                                </tbody>
+                            </table>
+                            <br/>
+                            <a href="<c:url value='/customer/openCafeMarketingWrite.do' />" id="write"><button type="button" class="btn w-xs btn-primary">등록</button></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+		</div>
     </div>
 
     <!-- Footer-->
@@ -76,7 +141,6 @@
 <script src="<c:url value="/resources/vendor/iCheck/icheck.min.js"/>"></script>
 <script src="<c:url value="/resources/vendor/peity/jquery.peity.min.js"/>"></script>
 <script src="<c:url value="/resources/vendor/sparkline/index.js"/>"></script>
-<script src="<c:url value="/resources/vendor/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.js"/>"></script>
 
 <!-- DataTables -->
 <script src="<c:url value="/resources/vendor/datatables/media/js/jquery.dataTables.min.js"/>"></script>
@@ -96,53 +160,43 @@
 <script src="<c:url value="/resources/scripts/commons.js"/>"></script>
 
 <script>
-
-	$(document).ready(function(){
-		
-		// Initializ Table
-        $('#tableMenu').dataTable();
-		
-		$("#menuPrice").TouchSpin({
-            min: 0,
-            max: 99999,
-            step: 100,
-            boostat: 5,
-            maxboostedstep: 10000,
+     
+    $(document).ready(function(){
+    	
+    	// Initializ Table
+        $('#tableTimeSaleBoard').dataTable( {
+        	"order": [[ 0, "desc" ]]
+        } );
+    	
+    	$("#write").on("click", function(e){ //등록 버튼
+            e.preventDefault();
+        }); 
+    	
+        $("a[name='terminate']").on("click", function(e){ //제목 
+            e.preventDefault();
+            fn_terminateMarketing($(this));
         });
-		
-		$("#cancle").on("click", function(e){ //취소 버튼 
-	        e.preventDefault();
-	        fn_openCafeMenuMnt();
-	    });
-	     
-	    $("#insert").on("click", function(e){ //저장 버튼 
-	        e.preventDefault();
-	        fn_insertCafeMenu();
-	    });
-	    
-	});
-	
-	function fn_openCafeMenuMnt(){
-	    var comSubmit = new ComSubmit();
-	    comSubmit.setUrl("<c:url value='/customer/openCafeMenuMnt.do' />");
-	    comSubmit.submit();
-	}
-	
-	function fn_insertCafeMenu(){
-	    var comSubmit = new ComSubmit();
-	    var idx = "${cafeIDX }";
-	    var menuType = $('input#menuType:checked').val();
-	    var menuName = $('input#menuName').val();
-	    var menuPrice = $('input#menuPrice').val();
-	    comSubmit.setUrl("<c:url value='/customer/insertCafeMenu.do' />");
-	    comSubmit.addParam("cafeIDX", idx);
-	    comSubmit.addParam("menuType", menuType);
-	    comSubmit.addParam("menuName", menuName);
-	    comSubmit.addParam("menuPrice", menuPrice);
-	    comSubmit.submit();
-	}
-	
+        
+        $("a[name='restart']").on("click", function(e){ //제목 
+            e.preventDefault();
+            fn_restartMarketing($(this));
+        });
+    });
 
+    function fn_terminateMarketing(obj){
+        var comSubmit = new ComSubmit();
+        comSubmit.setUrl("<c:url value='/customer/terminateMarketing.do' />");
+        comSubmit.addParam("marketingIDX", obj.parent().find("#marketingIDX").val());
+        comSubmit.submit();
+    }
+    
+    function fn_restartMarketing(obj){
+        var comSubmit = new ComSubmit();
+        comSubmit.setUrl("<c:url value='/customer/restartMarketing.do' />");
+        comSubmit.addParam("marketingIDX", obj.parent().find("#marketingIDX").val());
+        comSubmit.submit();
+    }
+    
 </script>
 
 </body>

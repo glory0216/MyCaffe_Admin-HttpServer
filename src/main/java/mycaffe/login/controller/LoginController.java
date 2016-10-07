@@ -1,9 +1,11 @@
 package mycaffe.login.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.springframework.security.core.Authentication;
@@ -52,7 +54,7 @@ public class LoginController {
 	}
 	
 	@RequestMapping("/loginSuccess.do")
-	public ModelAndView loginSuccess(CommandMap commandMap) throws Exception {
+	public ModelAndView loginSuccess(CommandMap commandMap, HttpServletRequest request) throws Exception {
 		ModelAndView mv = new ModelAndView("/main");
 		
 		//Spring Security 로그인 정보 가져와서 commandMap에 put
@@ -67,16 +69,22 @@ public class LoginController {
 		System.out.println("customer IDX : " + customerIDX);
 		System.out.println("카페 이름 : " + cafeName);
 		
-		int cafeIDX = customerService.getCafeIDX(customerIDX);
+		Map<String, Object> tempMap = new HashMap<String, Object>(); 
+		tempMap = customerService.getCafeInfo(customerIDX);
 		
-		commandMap.getMap().put("cafeIDX", cafeIDX);
-		
-		System.out.println("카페 IDX : " + cafeIDX);
+		commandMap.getMap().put("cafeIDX", tempMap.get("cafeIDX"));
+		System.out.println("카페 IDX : " + tempMap.get("cafeIDX"));
 		
 		List<Map<String, Object>> list = boardService.selectRecentlyOrderList5(commandMap.getMap());
 		
 		mv.addObject("list", list);
-		mv.addObject("cafeName", cafeName);
+		
+		request.getSession().setAttribute("cafeIDX", tempMap.get("cafeIDX"));
+		request.getSession().setAttribute("cafeName", tempMap.get("cafeName"));
+		request.getSession().setAttribute("cafeTel", tempMap.get("cafeTel"));
+		request.getSession().setAttribute("cafeLocation", tempMap.get("cafeLocation"));
+		request.getSession().setAttribute("cafeComment", tempMap.get("cafeComment"));
+		request.getSession().setAttribute("cafeLogo", tempMap.get("cafeLogo"));
 		
 		return mv;
 	}
@@ -101,9 +109,5 @@ public class LoginController {
 		
 		return mv;
 	}
-	
-	/********************
-	* App 사용 유저 로그인
-	********************/
 	
 }

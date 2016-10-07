@@ -4,24 +4,22 @@
 <mapper namespace="board">
 
 	<select id="selectRecentlyOrderList5" parameterType="hashmap" resultType="hashmap">
-		SELECT menu.menuName, dorder.menuQuantity, torder.orderReceivedTime, user.userNickname, torder.orderFlag
-		FROM TOrder AS torder, TOrderDetail AS dorder, TUser AS user, TCafe AS cafe, TMenu AS menu
+		SELECT menu.menuName, torder.menuQuantity, torder.orderReceivedTime, user.userNickname, torder.orderFlag
+		FROM TOrder AS torder, TUser AS user, TCafe AS cafe, TMenu AS menu
 		WHERE user.userIDX = torder.userIDX
 		AND cafe.cafeIDX = torder.cafeIDX
-		AND menu.menuIDX = dorder.menuIDX  
-		AND dorder.orderDetailIDX = torder.orderDetailIDX 
+		AND menu.menuIDX = torder.menuIDX  
 		AND torder.cafeIDX = #{cafeIDX}
 		ORDER BY torder.orderIDX DESC
 		LIMIT 5
 	</select>
 	
 	<select id="selectRecentlyOrderList" parameterType="hashmap" resultType="hashmap">
-		SELECT menu.menuName, dorder.menuQuantity, torder.orderReceivedTime, user.userNickname, torder.orderFlag
-		FROM TOrder AS torder, TOrderDetail AS dorder, TUser AS user, TCafe AS cafe, TMenu AS menu
+		SELECT menu.menuName, torder.menuQuantity, torder.orderReceivedTime, user.userNickname, torder.orderFlag
+		FROM TOrder AS torder, TUser AS user, TCafe AS cafe, TMenu AS menu
 		WHERE user.userIDX = torder.userIDX
 		AND cafe.cafeIDX = torder.cafeIDX
-		AND menu.menuIDX = dorder.menuIDX  
-		AND dorder.orderDetailIDX = torder.orderDetailIDX 
+		AND menu.menuIDX = torder.menuIDX  
 		AND torder.cafeIDX = #{cafeIDX}
 		ORDER BY torder.orderIDX DESC
 	</select>
@@ -42,12 +40,11 @@
 	</select>
 	
 	<select id="selectUserOrderList" parameterType="hashmap" resultType="hashmap">
-		SELECT menu.menuName, dorder.menuQuantity, torder.orderReceivedTime, torder.orderFlag
-		FROM TOrder AS torder, TOrderDetail AS dorder, TUser AS user, TCafe AS cafe, TMenu AS menu
+		SELECT menu.menuName, torder.menuQuantity, torder.orderReceivedTime, torder.orderFlag
+		FROM TOrder AS torder, TUser AS user, TCafe AS cafe, TMenu AS menu
 		WHERE user.userIDX = torder.userIDX
 		AND cafe.cafeIDX = torder.cafeIDX
-		AND menu.menuIDX = dorder.menuIDX  
-		AND dorder.orderDetailIDX = torder.orderDetailIDX 
+		AND menu.menuIDX = torder.menuIDX  
 		AND torder.cafeIDX = #{cafeIDX}
 		AND user.userNickname = #{userNickname}
 		ORDER BY torder.orderIDX DESC

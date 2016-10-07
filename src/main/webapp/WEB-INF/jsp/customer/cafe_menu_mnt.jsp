@@ -123,11 +123,15 @@
                 <div class="panel-body">
                 <form method="get" class="form-horizontal">
 				<div class="form-group"><label class="col-sm-2 control-label">메뉴 종류</label>
-					
-					<div class="col-sm-10">
+					<div class="col-sm-4">
                    		<div class="radio"><label> <input type="radio" class="i-checks" id="menuType" name="menuType" value="1" checked> 음료 </label></div>
                    		<div class="radio"><label> <input type="radio" class="i-checks" id="menuType" name="menuType" value="2"> 베이커리 </label></div>
                    		<div class="radio"><label> <input type="radio" class="i-checks" id="menuType" name="menuType" value="3"> 기타 </label></div>
+                	</div>
+                	<label class="col-sm-2 control-label">메뉴 사진</label>
+                	<div class="col-sm-4">
+                   		<input type="file" name="file">
+                        <span class="help-block small">App에 보여질 카페 메뉴 이미지 파일 크기는 10MB까지 지원됩니다 </span>
                 	</div>
                 </div>
 				<div class="hr-line-dashed"></div>

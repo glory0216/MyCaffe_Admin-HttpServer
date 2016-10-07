@@ -56,12 +56,12 @@ public class CustomerController {
 		
 		//가맹점주 아이디 중복 검사
 		if (customerService.getSignUpResult(commandMap.getMap()) == 1) {
-			
+			log.debug("아이디가 이미 존재함. ");
 		}
 
 		else {
 			
-			int certNumber = (Integer.parseInt(commandMap.getMap().get("certNumber").toString()));
+			int certNumber = Integer.parseInt(commandMap.getMap().get("certNumber").toString());
 			
 			//가맹점주 가입을 위한 인증번호 검사
 			if (certificationService.getCertificationNumber(certNumber) == certNumber) {
@@ -74,13 +74,14 @@ public class CustomerController {
 				commandMap.getMap().remove("userPassword");
 				commandMap.getMap().put("userPassword", hashPassword);
 				
+				// cafeTel을 이용하여 카페 정보 중복 체크 해야함
 				customerService.addCafe(commandMap.getMap());
 				
 				int cafeIDX = customerService.getCafeIDXByCafeTel(commandMap.getMap().get("cafeTel"));
 				System.out.println("cafeIDX : " + cafeIDX);
 				
 				commandMap.getMap().put("cafeIDX", cafeIDX);
-				customerService.addCustomer(commandMap.getMap());
+				customerService.addCustomer(commandMap.getMap(), request);
 				
 				autoLogin(username, userPwd, request);
 			}
@@ -107,115 +108,93 @@ public class CustomerController {
     // Cafe Management
     //================================================================================
 	
-	@RequestMapping("/customer/openCafeInfoUpdate.do")
+	@RequestMapping("/customer/openCafeInfoMnt.do")
 	public ModelAndView openCafeInfoUpdate(CommandMap commandMap) throws Exception {
 		ModelAndView mv = new ModelAndView("/customer/cafe_info_update");
-		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-   		String customerId = auth.getName();
-   		commandMap.getMap().put("customerId", customerId);
-    					
-   		int customerIDX = customerService.getCustomerIDX(commandMap.getMap().get("customerId"));
-   		String cafeName = customerService.getCafeName(customerIDX);
-  		commandMap.getMap().put("customerIDX", customerIDX);
-    			
-    	int cafeIDX = customerService.getCafeIDX(customerIDX);
-    	commandMap.getMap().put("cafeIDX", cafeIDX);
-    	
-    	mv.addObject("cafeName", cafeName);
-    	mv.addObject("cafeIDX", cafeIDX);
-		
+				
 		return mv;
 	}
 	
 	@RequestMapping("/customer/updateCafeName.do")
-	public ModelAndView updateCafeName(CommandMap commandMap) throws Exception {
+	public ModelAndView updateCafeName(CommandMap commandMap, HttpServletRequest request) throws Exception {
 		ModelAndView mv = new ModelAndView("redirect:/customer/openCafeInfoMnt.do");
 		
-		//Param : CafeName, CafeIDX
+		//Param : cafeName, cafeIDX
 		
-		customerService.updateCafeName(commandMap.getMap());
+		customerService.updateCafeName(commandMap.getMap(), request);
 		
 		return mv;
 	}
 	
 	@RequestMapping("/customer/updateCafeTel.do")
-	public ModelAndView updateCafeTel(CommandMap commandMap) throws Exception {
+	public ModelAndView updateCafeTel(CommandMap commandMap, HttpServletRequest request) throws Exception {
 		ModelAndView mv = new ModelAndView("redirect:/customer/openCafeInfoMnt.do");
 		
-		//Param : CafeName, CafeIDX
+		//Param : cafeName, cafeIDX
 		
-		customerService.updateCafeTel(commandMap.getMap());
+		customerService.updateCafeTel(commandMap.getMap(), request);
 		
 		return mv;
 	}
 	
 	@RequestMapping("/customer/updateCafeLocation.do")
-	public ModelAndView updateCafeLocation(CommandMap commandMap) throws Exception {
+	public ModelAndView updateCafeLocation(CommandMap commandMap, HttpServletRequest request) throws Exception {
 		ModelAndView mv = new ModelAndView("redirect:/customer/openCafeInfoMnt.do");
 		
-		//Param : CafeName, CafeIDX
+		//Param : cafeName, cafeIDX
 		
-		customerService.updateCafeLocation(commandMap.getMap());
+		customerService.updateCafeLocation(commandMap.getMap(), request);
 		
 		return mv;
 	}
 	
 	@RequestMapping("/customer/updateCafeComment.do")
-	public ModelAndView updateCafeComment(CommandMap commandMap) throws Exception {
+	public ModelAndView updateCafeComment(CommandMap commandMap, HttpServletRequest request) throws Exception {
 		ModelAndView mv = new ModelAndView("redirect:/customer/openCafeInfoMnt.do");
 		
-		//Param : CafeName, CafeIDX
+		//Param : cafeIDX
 		
-		customerService.updateCafeComment(commandMap.getMap());
+		customerService.updateCafeComment(commandMap.getMap(), request);
+		
+		return mv;
+	}
+	
+	@RequestMapping("/customer/updateCafeLogo.do")
+	public ModelAndView updateCafeLogo(CommandMap commandMap, HttpServletRequest request) throws Exception {
+		ModelAndView mv = new ModelAndView("redirect:/customer/openCafeInfoMnt.do");
+		
+		int cafeIDX = Integer.parseInt(request.getSession().getAttribute("cafeIDX").toString());
+		commandMap.getMap().put("cafeIDX", cafeIDX);
+		
+		customerService.updateCafeLogo(commandMap.getMap(), request);
 		
 		return mv;
 	}
 	
 	@RequestMapping("/customer/openCafeMenuMnt.do")
-	public ModelAndView openCafeMenuMnt(CommandMap commandMap) throws Exception {
+	public ModelAndView openCafeMenuMnt(CommandMap commandMap, HttpServletRequest request) throws Exception {
 		ModelAndView mv = new ModelAndView("/customer/cafe_menu_mnt");
 		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-   		String customerId = auth.getName();
-   		commandMap.getMap().put("customerId", customerId);
-    					
-   		int customerIDX = customerService.getCustomerIDX(commandMap.getMap().get("customerId"));
-   		String cafeName = customerService.getCafeName(customerIDX);
-  		commandMap.getMap().put("customerIDX", customerIDX);
-    			
-    	int cafeIDX = customerService.getCafeIDX(customerIDX);
-    	commandMap.getMap().put("cafeIDX", cafeIDX);
+		int cafeIDX = Integer.parseInt(request.getSession().getAttribute("cafeIDX").toString());
+		commandMap.getMap().put("cafeIDX", cafeIDX);
     	
     	List<Map<String, Object>> list = customerService.selectMenuBoardList(commandMap.getMap());
     	
     	mv.addObject("list", list);
-    	mv.addObject("cafeName", cafeName);
-    	mv.addObject("cafeIDX", cafeIDX);
 		
 		return mv;
 	}
 	
 	@RequestMapping("/customer/openCafeMenuUpdate.do")
-	public ModelAndView openCafeMenuUpdate(CommandMap commandMap) throws Exception {
+	public ModelAndView openCafeMenuUpdate(CommandMap commandMap, HttpServletRequest request) throws Exception {
 		ModelAndView mv = new ModelAndView("/customer/cafe_menu_update");
 		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-   		String customerId = auth.getName();
-   		commandMap.getMap().put("customerId", customerId);
-    					
-   		int customerIDX = customerService.getCustomerIDX(commandMap.getMap().get("customerId"));
-   		String cafeName = customerService.getCafeName(customerIDX);
-  		commandMap.getMap().put("customerIDX", customerIDX);
-    			
-    	int cafeIDX = customerService.getCafeIDX(customerIDX);
-    	commandMap.getMap().put("cafeIDX", cafeIDX);
+		int cafeIDX = Integer.parseInt(request.getSession().getAttribute("cafeIDX").toString());
+		commandMap.getMap().put("cafeIDX", cafeIDX);
     		
     	Map<String, Object> map = customerService.selectMenuDetail(commandMap.getMap());
     	
     	mv.addObject("map", map);
-    	mv.addObject("cafeName", cafeName);
-    	mv.addObject("cafeIDX", cafeIDX);
 		
 		return mv;
 	}
@@ -253,49 +232,80 @@ public class CustomerController {
 		return mv;
 	}
 	
-	@RequestMapping("/customer/openCafeEventMnt.do")
-	public ModelAndView openCafeEventMnt(CommandMap commandMap) throws Exception {
-		ModelAndView mv = new ModelAndView("/customer/cafe_event_mnt");
+	@RequestMapping("/customer/openCafeMarketingMnt.do")
+	public ModelAndView openCafeMarketingMnt(CommandMap commandMap, HttpServletRequest request) throws Exception {
+		ModelAndView mv = new ModelAndView("/customer/cafe_marketing_mnt");
 		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-   		String customerId = auth.getName();
-   		commandMap.getMap().put("customerId", customerId);
-    					
-   		int customerIDX = customerService.getCustomerIDX(commandMap.getMap().get("customerId"));
-   		String cafeName = customerService.getCafeName(customerIDX);
-  		commandMap.getMap().put("customerIDX", customerIDX);
-    			
-    	int cafeIDX = customerService.getCafeIDX(customerIDX);
-    	commandMap.getMap().put("cafeIDX", cafeIDX);
+		int cafeIDX = Integer.parseInt(request.getSession().getAttribute("cafeIDX").toString());
+		commandMap.getMap().put("cafeIDX", cafeIDX);
+		
+		List<Map<String, Object>> list = customerService.selectMarketingList(commandMap.getMap());
     	
-    	mv.addObject("cafeName", cafeName);
-    	mv.addObject("cafeIDX", cafeIDX);
+    	mv.addObject("list", list);
 		
 		return mv;
 	}
 	
+	@RequestMapping("/customer/openCafeMarketingWrite.do")
+	public ModelAndView openCafeMarketingWrite(CommandMap commandMap, HttpServletRequest request) throws Exception {
+		ModelAndView mv = new ModelAndView("/customer/cafe_marketing_write");	
+		
+		int cafeIDX = Integer.parseInt(request.getSession().getAttribute("cafeIDX").toString());
+		commandMap.getMap().put("cafeIDX", cafeIDX);
+		
+		List<Map<String, Object>> list = customerService.selectMenuBoardList(commandMap.getMap());
+		
+		mv.addObject("list", list);
+		
+		return mv;
+	}
+	
+	@RequestMapping("/customer/registerMarketing.do")
+	public ModelAndView registerMarketing(CommandMap commandMap, HttpServletRequest request) throws Exception {
+		ModelAndView mv = new ModelAndView("redirect:/customer/openCafeMarketingMnt.do");
+		
+		int cafeIDX = Integer.parseInt(request.getSession().getAttribute("cafeIDX").toString());
+		commandMap.getMap().put("cafeIDX", cafeIDX);
+		
+		customerService.insertMarketing(commandMap.getMap());
+		
+		return mv;
+	}
+	
+	@RequestMapping("/customer/restartMarketing.do")
+	public ModelAndView restartMarketing(CommandMap commandMap, HttpServletRequest request) throws Exception {
+		ModelAndView mv = new ModelAndView("redirect:/customer/openCafeMarketingMnt.do");
+		
+		int cafeIDX = Integer.parseInt(request.getSession().getAttribute("cafeIDX").toString());
+		commandMap.getMap().put("cafeIDX", cafeIDX);
+		
+		customerService.restartMarketing(commandMap.getMap());
+		
+		return mv;
+	}
+	
+	@RequestMapping("/customer/terminateMarketing.do")
+	public ModelAndView openterminateMarketing(CommandMap commandMap, HttpServletRequest request) throws Exception {
+		ModelAndView mv = new ModelAndView("redirect:/customer/openCafeMarketingMnt.do");
+		
+		int cafeIDX = Integer.parseInt(request.getSession().getAttribute("cafeIDX").toString());
+		commandMap.getMap().put("cafeIDX", cafeIDX);
+		
+		customerService.terminateMarketing(commandMap.getMap());
+	
+		return mv;
+	}
 
 	//================================================================================
     // E-Coupon Management
     //================================================================================
 	
 	@RequestMapping("/customer/openCouponSave.do")
-	public ModelAndView openCouponSave(CommandMap commandMap) throws Exception {
+	public ModelAndView openCouponSave(CommandMap commandMap, HttpServletRequest request) throws Exception {
 		ModelAndView mv = new ModelAndView("/customer/coupon_save");
 		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-   		String customerId = auth.getName();
-   		commandMap.getMap().put("customerId", customerId);
-    					
-   		int customerIDX = customerService.getCustomerIDX(commandMap.getMap().get("customerId"));
-   		String cafeName = customerService.getCafeName(customerIDX);
-  		commandMap.getMap().put("customerIDX", customerIDX);
-    			
-    	int cafeIDX = customerService.getCafeIDX(customerIDX);
-    	commandMap.getMap().put("cafeIDX", cafeIDX);
-    	
-    	mv.addObject("cafeName", cafeName);
-    	mv.addObject("cafeIDX", cafeIDX);
+		int cafeIDX = Integer.parseInt(request.getSession().getAttribute("cafeIDX").toString());
+		commandMap.getMap().put("cafeIDX", cafeIDX);
 		
 		return mv;
 	}
@@ -312,25 +322,15 @@ public class CustomerController {
 	}
 	
 	@RequestMapping("/customer/openCouponAnalytics.do")
-	public ModelAndView openCouponAnalytics(CommandMap commandMap) throws Exception {
+	public ModelAndView openCouponAnalytics(CommandMap commandMap, HttpServletRequest request) throws Exception {
 		ModelAndView mv = new ModelAndView("/customer/coupon_analytics");
 		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-   		String customerId = auth.getName();
-   		commandMap.getMap().put("customerId", customerId);
-    					
-   		int customerIDX = customerService.getCustomerIDX(commandMap.getMap().get("customerId"));
-   		String cafeName = customerService.getCafeName(customerIDX);
-  		commandMap.getMap().put("customerIDX", customerIDX);
-    			
-    	int cafeIDX = customerService.getCafeIDX(customerIDX);
-    	commandMap.getMap().put("cafeIDX", cafeIDX);
+		int cafeIDX = Integer.parseInt(request.getSession().getAttribute("cafeIDX").toString());
+		commandMap.getMap().put("cafeIDX", cafeIDX);
     	
     	List<Map<String, Object>> list = customerService.selectCouponAnalyticsBoardList(commandMap.getMap());
     	
     	mv.addObject("list", list);
-    	mv.addObject("cafeName", cafeName);
-    	mv.addObject("cafeIDX", cafeIDX);
 		
 		return mv;
 	}
@@ -340,27 +340,17 @@ public class CustomerController {
     //================================================================================
 	
 	@RequestMapping("/customer/openUserInfo.do")
-	public ModelAndView openUserInfo(CommandMap commandMap) throws Exception {
+	public ModelAndView openUserInfo(CommandMap commandMap, HttpServletRequest request) throws Exception {
 		ModelAndView mv = new ModelAndView("/customer/user_info");
 		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-   		String customerId = auth.getName();
-   		commandMap.getMap().put("customerId", customerId);
-    					
-   		int customerIDX = customerService.getCustomerIDX(commandMap.getMap().get("customerId"));
-   		String cafeName = customerService.getCafeName(customerIDX);
-  		commandMap.getMap().put("customerIDX", customerIDX);
-    			
-    	int cafeIDX = customerService.getCafeIDX(customerIDX);
-    	commandMap.getMap().put("cafeIDX", cafeIDX);
+		int cafeIDX = Integer.parseInt(request.getSession().getAttribute("cafeIDX").toString());
+		commandMap.getMap().put("cafeIDX", cafeIDX);
 		
     	List<Map<String, Object>> list = boardService.selectUserOrderList(commandMap.getMap());
     	Map<String, Object> map = customerService.selectUserInfo(commandMap.getMap());
     	
     	mv.addObject("map", map);
     	mv.addObject("list", list);
-    	mv.addObject("cafeName", cafeName);
-    	mv.addObject("cafeIDX", cafeIDX);
     	
 		return mv;
 	}
@@ -377,25 +367,15 @@ public class CustomerController {
     //================================================================================
 	
 	@RequestMapping("/customer/openRecentlyOrders.do")
-	public ModelAndView openRecentlyOrders(CommandMap commandMap) throws Exception {
+	public ModelAndView openRecentlyOrders(CommandMap commandMap, HttpServletRequest request) throws Exception {
 		ModelAndView mv = new ModelAndView("/customer/recently_order_mnt");
 		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-   		String customerId = auth.getName();
-   		commandMap.getMap().put("customerId", customerId);
-    					
-   		int customerIDX = customerService.getCustomerIDX(commandMap.getMap().get("customerId"));
-   		String cafeName = customerService.getCafeName(customerIDX);
-  		commandMap.getMap().put("customerIDX", customerIDX);
-    			
-    	int cafeIDX = customerService.getCafeIDX(customerIDX);
-    	commandMap.getMap().put("cafeIDX", cafeIDX);
+		int cafeIDX = Integer.parseInt(request.getSession().getAttribute("cafeIDX").toString());
+		commandMap.getMap().put("cafeIDX", cafeIDX);
     	
     	List<Map<String, Object>> list = boardService.selectRecentlyOrderList(commandMap.getMap());
     	
     	mv.addObject("list", list);
-    	mv.addObject("cafeName", cafeName);
-    	mv.addObject("cafeIDX", cafeIDX);
 		
 		return mv;
 	}

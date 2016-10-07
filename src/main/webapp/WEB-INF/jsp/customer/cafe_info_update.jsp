@@ -53,7 +53,7 @@
                     카페 정보 수정
                 </div>
                 <div class="panel-body">
-                <form method="get" class="form-horizontal">
+                <form method="post" class="form-horizontal" enctype="multipart/form-data">
                 <div class="form-group"><label class="col-sm-2 control-label">카페 이름</label>
 
                     <div class="col-sm-10">
@@ -88,9 +88,23 @@
                     	<span class="input-group-btn"> <a href="#this" id="editComment"><button type="button" class="btn w-xs btn-primary">수정</button></a> </span>
                     	</div>
                     </div>
-                </div>                
+                </div>
                 <div class="hr-line-dashed"></div>
                 </form>
+                
+                <form method="post" class="form-horizontal" action="<c:url value='/customer/updateCafeLogo.do' />" enctype="multipart/form-data">
+					<div class="form-group"> <label class="col-sm-2 control-label">카페 Logo Image</label>
+					<div class="col-sm-10">
+						<input type="file" class="form-control" name="file">
+						<span class="help-block small">App에 보여질 카페 로고 이미지 파일 크기는 10MB까지 지원됩니다 </span>
+					</div>
+					</div>
+					
+					<div class="text-center">
+                    	<button class="btn btn-primary">카페 로고 수정</button>
+                    </div>         
+                </form>
+                
                 </div>
             </div>
         </div>
@@ -151,6 +165,7 @@
 	        e.preventDefault();
 	        fn_updateCafeComment();
 	    });
+	    
 	});
 	
 	function fn_updateCafeName(){
@@ -192,7 +207,6 @@
 	    comSubmit.addParam("cafeComment", cafeComment);
 	    comSubmit.submit();
 	}
-
 
 </script>
 

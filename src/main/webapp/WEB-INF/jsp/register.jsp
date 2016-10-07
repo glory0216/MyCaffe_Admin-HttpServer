@@ -46,7 +46,7 @@
             </div>
             <div class="hpanel">
                 <div class="panel-body">
-                        <form method="post" action="<c:url value="/customer/signup.do" />">
+                        <form method="post" action="<c:url value="/customer/signup.do" />" enctype="multipart/form-data">
                             <div class="row">
                             <div class="form-group col-lg-12">
                                 <label>ID</label>
@@ -81,6 +81,11 @@
                                 <label>카페 Comment</label>
                                 <input type="text" value="" id="cafeComment" class="form-control" name="cafeComment" required="">
                                 <span class="help-block small">App에 홍보할 수 있는 한마디를 입력하세요 </span>
+                            </div>
+                            <div class="form-group col-lg-12">
+                            	<label>카페 Logo Image 등록</label>
+                            	<input type="file" name="file">
+                            	<span class="help-block small">App에 보여질 카페 로고 이미지 파일 크기는 10MB까지 지원됩니다 </span>
                             </div>
                             <div class="form-group col-lg-12">
                                 <label>인증 번호</label>

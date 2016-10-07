@@ -30,6 +30,10 @@ public class CustomerDAO extends AbstractDAO {
 		insert("customer.addCustomer", map);
 	}
 	
+	public void updateImageFile(Map<String, Object> map) throws Exception{
+	    update("customer.updateImageFile", map);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> getCustomerInfo(Map<String, Object> map) {
 		
@@ -56,9 +60,10 @@ public class CustomerDAO extends AbstractDAO {
 		return selectOne("customer.getCafeName", customerIDX).toString();
 	}
 	
-	public int getCafeIDX(int customerIDX) {
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> getCafeInfo(int customerIDX) {
 		
-		return (Integer) selectOne("customer.getCafeIDX", customerIDX);
+		return (Map<String, Object>)selectOne("customer.getCafeInfo", customerIDX);
 	}
 	
 	public void updateCafeName(Map<String, Object> map) {
@@ -108,6 +113,28 @@ public class CustomerDAO extends AbstractDAO {
 		return (Map<String, Object>) selectOne("customer.selectMenuDetail", map);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public List<Map<String, Object>> selectMarketingList(Map<String, Object> map) throws Exception {
+		// TODO Auto-generated method stub
+		
+		return (List<Map<String, Object>>)selectList("customer.selectMarketingList", map);
+	}
+	
+	public void insertMarketing(Map<String, Object> map) {
+		
+		insert("customer.insertMarketing", map);
+	}
+	
+	public void restartMarketing(Map<String, Object> map) {
+		
+		update("customer.restartMarketing", map);
+	}
+	
+	public void terminateMarketing(Map<String, Object> map) {
+		
+		update("customer.terminateMarketing", map);
+	}
+	
 	public void insertCoupon(Map<String, Object> map) {
 		
 		insert("customer.insertCoupon", map);
@@ -149,5 +176,11 @@ public class CustomerDAO extends AbstractDAO {
 		
 		return (Integer) selectOne("customer.getCafeIDXByCafeTel", cafeTel);
 	}
+
+	public String getCafeLogo(int cafeIDX) {
+		
+		return selectOne("customer.getCafeLogo", cafeIDX).toString();
+	}
 	
 }
+

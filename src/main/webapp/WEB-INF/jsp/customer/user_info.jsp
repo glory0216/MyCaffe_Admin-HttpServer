@@ -102,6 +102,9 @@
 		</div>
 		<div class="row">
 			<div class="col-lg-4">
+			<div class="panel-heading">
+                       	회원 정보
+            </div>
         		<div class="hpanel hgreen">
             		<div class="panel-body">
                 		<img alt="profilePhoto" class="img-circle m-b m-t-md" src="images/profile.jpg">

@@ -55,8 +55,8 @@
  		AND customer.customerIDX = #{customerIDX}
  	</select>
  	
- 	<select id="getCafeIDX" parameterType="Integer" resultType="Integer">
- 		SELECT cafe.cafeIDX
+ 	<select id="getCafeInfo" parameterType="Integer" resultType="hashmap">
+ 		SELECT cafe.*
  		FROM TCafe AS cafe, TCustomer AS customer
  		WHERE cafe.cafeIDX = customer.cafeIDX
  		AND customer.customerIDX = #{customerIDX}
@@ -80,7 +80,7 @@
 	<select id="selectUserIDX" parameterType="hashmap" resultType="Integer">
 		SELECT userIDX 
 		FROM TUser
-		WHERE userNickname = #{userNickname}
+		WHERE userPhone = #{userPhone}
 	</select>
 	
 	<select id="selectCouponCount" parameterType="hashmap" resultType="Integer">
@@ -91,12 +91,11 @@
 	</select>
 	
 	<select id="selectCouponAnalyticsBoardList" parameterType="hashmap" resultType="hashmap">
-		SELECT user.userNickname, menu.menuName, dorder.menuQuantity, torder.orderReceivedTime, coupon.couponAmount 
-		FROM TCoupon AS coupon, TMenu AS menu, TCafe AS cafe, TUser AS user, TOrder AS torder, TOrderDetail AS dorder 
+		SELECT user.userNickname, menu.menuName, torder.menuQuantity, torder.orderReceivedTime, coupon.couponAmount 
+		FROM TCoupon AS coupon, TMenu AS menu, TCafe AS cafe, TUser AS user, TOrder AS torder 
 		WHERE torder.userIDX = user.userIDX 
-		AND torder.orderDetailIDX = dorder.orderDetailIDX 
+		AND torder.menuIDX = menu.menuIDX 
 		AND torder.cafeIDX = cafe.cafeIDX
-		AND dorder.menuIDX = menu.menuIDX
 		AND menu.cafeIDX = cafe.cafeIDX 
 		AND coupon.userIDX = user.userIDX 
 		AND coupon.cafeIDX = cafe.cafeIDX 
@@ -121,6 +120,20 @@
  		FROM TCafe
  		WHERE cafeTel = #{cafeTel}
  	</select>
+ 	
+ 	<select id="getCafeLogo" parameterType="Integer" resultType="String">
+ 		SELECT cafeLogo
+ 		FROM TCafe
+ 		WHERE cafeIDX = #{cafeIDX}
+ 	</select>
+ 	
+ 	<select id="selectMarketingList" parameterType="hashmap" resultType="hashmap">
+		SELECT marketing.marketingIDX, marketing.marketingTimeZone, marketing.marketingFlag, marketing.menuName, marketing.menuPrice
+		FROM TMarketing AS marketing, TCafe AS cafe, TMenu AS menu
+		WHERE marketing.menuIDX = menu.menuIDX
+		AND marketing.cafeIDX = cafe.cafeIDX
+		AND cafe.cafeIDX = #{cafeIDX}
+	</select>
 	
  	<!-- insert -->
  	<insert id="addCustomer" parameterType="hashmap">
@@ -151,11 +164,24 @@
  		(#{cafeName}, #{cafeTel}, #{cafeLocation}, #{cafeComment})
  	</insert>
  	
+ 	<insert id="insertMarketing" parameterType="hashmap">
+ 		INSERT INTO TMarketing
+ 		(cafeIDX, menuIDX, menuName, menuPrice, marketingTimeZone)
+ 		VALUES 
+ 		(#{cafeIDX}, #{menuIDX}, #{menuName}, #{menuPrice}, #{timeZone})
+ 	</insert>
+ 	
  	<!-- update -->
  	<update id="editCustomer" parameterType="hashmap">
  		UPDATE TCustomer
  		SET customerTel = #{userPhone}, userDateUpdate = CURRENT_TIMESTAMP
  		WHERE customerId = #{userId}
+ 	</update>
+ 	
+ 	<update id="updateImageFile" parameterType="hashmap">
+ 		UPDATE TCafe
+ 		SET cafeLogo = #{cafeLogo}
+ 		WHERE cafeIDX = #{cafeIDX}
  	</update>
  	
  	<update id="updateCafeName" parameterType="hashmap">
@@ -196,6 +222,19 @@
  		AND cafeIDX = #{cafeIDX}
  	</update>
  	
+ 	<update id="restartMarketing" parameterType="hashmap">
+ 		UPDATE TMarketing
+ 		SET marketingFlag = 1
+ 		WHERE marketingIDX = #{marketingIDX}
+ 		AND cafeIDX = #{cafeIDX}
+ 	</update>
+ 	
+ 	<update id="terminateMarketing" parameterType="hashmap">
+ 		UPDATE TMarketing
+ 		SET marketingFlag = 0
+ 		WHERE marketingIDX = #{marketingIDX}
+ 		AND cafeIDX = #{cafeIDX}
+ 	</update>
  	
  	<!-- delete -->
  	

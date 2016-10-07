@@ -18,7 +18,7 @@
         </div>
         <form role="search" class="navbar-form-custom" method="post" action="<c:url value="/customer/openUserInfo.do"/>">
             <div class="form-group">
-                <input type="text" placeholder="회원의 별명을 검색하세요" class="form-control" name="userNickname" id="userNickname">
+                <input type="text" placeholder="회원의 전화번호로 검색하세요" class="form-control" name="userPhone" id="userPhone">
             </div>
         </form>
         <div class="mobile-menu">
